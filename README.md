@@ -1,3 +1,10 @@
+We use the VLMEvalKit repo to conduct benchmarking. Llava.py needs to be edited to choose how many 1-bit layers and text vs. mix calibration.
+
+Code to evaluate:
+```bash
+python3 run.py --data [DATASET] --model llava_v1.5_7b
+```
+
 ![LOGO](http://opencompass.openxlab.space/utils/MMLB.jpg)
 
 <b>A Toolkit for Evaluating Large Vision-Language Models. </b>

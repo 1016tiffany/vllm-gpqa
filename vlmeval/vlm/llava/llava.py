@@ -40,12 +40,14 @@ class LLaVA(BaseModel):
             model_name = get_model_name_from_path(model_path)
 
         try:
+            #edit here
             self.tokenizer, self.model, self.image_processor, self.context_len = (
                 load_pretrained_model(
                     model_path=model_path,
                     model_base=None,
                     model_name=model_name,
-                    device_map="cpu",
+                    # device_map="cpu",
+                    mode='mix', eval=False, n_1bit=0,
                 )
             )
         except Exception as err:
@@ -67,7 +69,8 @@ class LLaVA(BaseModel):
         kwargs_default = dict(
             do_sample=False,
             temperature=0,
-            max_new_tokens=2048,
+            max_new_tokens=64, 
+            # 64 instead of 2048 gets rid of the problem where the model will stay on one instance for a long time
             top_p=None,
             num_beams=1,
             use_cache=True,
@@ -286,7 +289,7 @@ class LLaVA_Next(BaseModel):
         model = model.eval()
         self.model = model.cuda()
         kwargs_default = dict(
-            do_sample=False, temperature=0, max_new_tokens=2048, top_p=None, num_beams=1
+            do_sample=False, temperature=0, max_new_tokens=64, top_p=None, num_beams=1
         )
         kwargs_default.update(kwargs)
         self.kwargs = kwargs_default
@@ -485,7 +488,7 @@ class LLaVA_Next2(BaseModel):
             images=image_tensor,
             do_sample=False,
             temperature=0,
-            max_new_tokens=2048,
+            max_new_tokens=64,
             stopping_criteria=[stopping_criteria],
         )
         text_outputs = self.tokenizer.batch_decode(cont, skip_special_tokens=True)[0]
@@ -666,7 +669,7 @@ class LLaVA_OneVision(BaseModel):
             image_sizes=image_sizes,  # Pass the image sizes here
             do_sample=False,
             temperature=0,
-            max_new_tokens=2048,
+            max_new_tokens=64,
             stopping_criteria=[stopping_criteria],
         )
         text_outputs = self.tokenizer.batch_decode(cont, skip_special_tokens=True)[0]
@@ -738,7 +741,7 @@ class LLaVA_OneVision(BaseModel):
             image_sizes=image_sizes,  # Pass the image sizes here
             do_sample=False,
             temperature=0,
-            max_new_tokens=2048,
+            max_new_tokens=64,
             modalities=modalities,
             stopping_criteria=[stopping_criteria],
         )
@@ -821,7 +824,7 @@ class LLaVA_OneVision_HF(BaseModel):
         prompt = self.processor.apply_chat_template(conversation, add_generation_prompt=True)
         inputs = self.processor(images=images, text=prompt, return_tensors="pt").to('cuda', torch.float16)
 
-        output = self.model.generate(**inputs, max_new_tokens=2048)
+        output = self.model.generate(**inputs, max_new_tokens=64)
         return self.processor.decode(output[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
 
     def generate_inner_video(self, message, dataset=None):
@@ -858,7 +861,7 @@ class LLaVA_OneVision_HF(BaseModel):
         prompt = self.processor.apply_chat_template(conversation, add_generation_prompt=True)
 
         inputs = self.processor(videos=video_frames, text=prompt, return_tensors="pt").to('cuda', torch.float16)
-        output = self.model.generate(**inputs, max_new_tokens=2048)
+        output = self.model.generate(**inputs, max_new_tokens=64)
         return self.processor.decode(output[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
 
     def load_video(self, video_path, max_frames_num, fps=1, force_sample=False):
