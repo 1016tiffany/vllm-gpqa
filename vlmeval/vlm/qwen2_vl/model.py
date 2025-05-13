@@ -69,7 +69,7 @@ class Qwen2VLChat(Qwen2VLPromptMixin, BaseModel):
         model_path: str,
         min_pixels: int | None = None,
         max_pixels: int | None = None,
-        max_new_tokens=2048,
+        max_new_tokens=64,
         top_p=0.001,
         top_k=1,
         temperature=0.01,
@@ -88,6 +88,7 @@ class Qwen2VLChat(Qwen2VLPromptMixin, BaseModel):
             top_k=top_k,
             temperature=temperature,
             repetition_penalty=repetition_penalty,
+            # use_cache=False,
         )
         self.system_prompt = system_prompt
         self.verbose = verbose
@@ -126,9 +127,23 @@ class Qwen2VLChat(Qwen2VLPromptMixin, BaseModel):
                 model_path, torch_dtype='auto', device_map='auto', attn_implementation='flash_attention_2'
             )
         else:
-            self.model = MODEL_CLS.from_pretrained(
-                model_path, torch_dtype='auto', device_map='cpu', attn_implementation='flash_attention_2'
-            )
+            # edit here
+            # self.model = MODEL_CLS.from_pretrained(
+            #     model_path, torch_dtype='auto', device_map='cpu'
+            # )
+            high_quant_model_name = "Qwen/Qwen2.5-VL-7B-Instruct-AWQ"
+            high_quant_model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            high_quant_model_name,  device_map="cpu", torch_dtype=torch.float16)
+    
+            low_quant_model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            "1_bit_qwen", torch_dtype=torch.float16) # currently set for BiLLM
+            layers_entropy_asc_order = [ 27, 26,18, 24, 23, 20,22, 21, 19, 17,25, 16, 15, 14, 13, 12, 11, 10, 9, 8, 1, 0, 3, 2,6 , 5,7 ,4 ]
+
+            for layer_num in layers_entropy_asc_order[:28]:
+                # Set the new layer to the model
+                high_quant_model.model.layers[layer_num] = low_quant_model.model.layers[layer_num]
+
+            self.model = high_quant_model
             self.model.cuda().eval()
 
         torch.cuda.empty_cache()
@@ -200,6 +215,7 @@ class Qwen2VLChat(Qwen2VLPromptMixin, BaseModel):
         generated_ids = self.model.generate(
             **inputs,
             **self.generate_kwargs,
+            # use_cache=False,
         )
         generated_ids = [
             output_ids[len(input_ids):] for input_ids, output_ids in zip(inputs.input_ids, generated_ids)

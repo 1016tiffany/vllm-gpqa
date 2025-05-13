@@ -1061,15 +1061,18 @@ qwen2vl_series = {
     "Qwen2.5-VL-7B-Instruct": partial(
         Qwen2VLChat,
         model_path="Qwen/Qwen2.5-VL-7B-Instruct",
+        # model_path="1_bit_qwen_LUQ_16layers",
         min_pixels=1280 * 28 * 28,
-        max_pixels=16384 * 28 * 28,
+        # max_pixels=16384 * 28 * 28,
+        max_pixels=1024*1024,
         use_custom_prompt=False,
     ),
     "Qwen2.5-VL-7B-Instruct-AWQ": partial(
         Qwen2VLChat,
         model_path="Qwen/Qwen2.5-VL-7B-Instruct-AWQ",
         min_pixels=1280 * 28 * 28,
-        max_pixels=16384 * 28 * 28,
+        # max_pixels=16384 * 28 * 28,
+        max_pixels=1024*1024,
         use_custom_prompt=False,
     ),
     "Qwen2.5-VL-32B-Instruct": partial(
