@@ -4,6 +4,15 @@ Code to evaluate:
 ```bash
 python3 run.py --data [DATASET] --model llava_v1.5_7b
 ```
+Current model options:
+1. llava_v1.5_7b
+2. Qwen2.5-VL-7B-Instruct
+
+To edit number of 1-bit layers in LUQ'ed model, edit:
+1. vlmeval/vlm/llava/llava.py
+2. vlmeval/vlm/qwen2_vl/model.py
+
+(working on adding as command line argument)
 
 ![LOGO](http://opencompass.openxlab.space/utils/MMLB.jpg)
 
