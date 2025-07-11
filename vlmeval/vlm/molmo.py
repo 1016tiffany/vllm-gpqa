@@ -43,11 +43,49 @@ class molmo(BaseModel):
             raise e
 
         if '72b' not in model_path.lower():
-            self.model = AutoModelForCausalLM.from_pretrained(
+            # edit here
+            # self.model = AutoModelForCausalLM.from_pretrained(
+            #     model_path,
+            #     trust_remote_code=True,
+            #     torch_dtype=torch.bfloat16,
+            #     device_map='cuda')
+            
+            high_quant_model = AutoModelForCausalLM.from_pretrained(
                 model_path,
                 trust_remote_code=True,
                 torch_dtype=torch.bfloat16,
-                device_map='cuda')
+                device_map='cuda',
+                load_in_4bit=True,)
+    
+            low_quant_model = AutoModelForCausalLM.from_pretrained(
+                "1_bit_molmo",
+                trust_remote_code=True,
+                torch_dtype=torch.bfloat16,
+                device_map='cuda',)
+            # Molmo entropy order
+            layers_entropy_asc_order = [27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0]
+            # Qwen entropy order
+            # layers_entropy_asc_order = [ 27, 26,18, 24, 23, 20,22, 21, 19, 17,25, 16, 15, 14, 13, 12, 11, 10, 9, 8, 1, 0, 3, 2,6 , 5,7 ,4 ]
+            
+            n_1bit = int(os.getenv("N1BIT", "0"))
+            for layer_num in layers_entropy_asc_order[:n_1bit]:
+                # Set the new layer to the model
+                high_quant_model.model.transformer.blocks[layer_num] = low_quant_model.model.transformer.blocks[layer_num]
+
+            self.model = high_quant_model
+
+            # Save model
+            # save_dir = "molmo_luq"
+            # self.model.save_pretrained(save_dir, safe_serialization=True)
+
+            # from transformers import AutoTokenizer
+            # tokenizer = AutoTokenizer.from_pretrained(model_path)
+            # tokenizer.save_pretrained(save_dir)
+
+            # print(f"LUQ model saved to {save_dir}/")
+            # breakpoint()
+
+            
         else:
             self.model = AutoModelForCausalLM.from_pretrained(
                 model_path,

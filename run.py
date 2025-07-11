@@ -150,8 +150,17 @@ You can launch the evaluation by setting either --data and --model or --config.
     parser.add_argument('--reuse-aux', type=bool, default=True, help='reuse auxiliary evaluation files')
     parser.add_argument(
         '--use-vllm', action='store_true', help='use vllm to generate, the flag is only supported in Llama4 for now')
+    parser.add_argument('--data-limit', type=int, help='Number of samples to keep from the head of each split')
+    parser.add_argument('--n-1bit', type=int, default=0, help='Number of 1-bit layers')
+    parser.add_argument(
+        '--debug-file', type=str, default=None,
+        help='Optional JSONL file to write every model answer for debugging')
 
     args = parser.parse_args()
+    os.environ['N1BIT'] = str(args.n_1bit)
+    if args.debug_file:
+        os.environ["DEBUG_OUTPUT_FILE"] = os.path.abspath(args.debug_file)
+
     return args
 
 
@@ -241,6 +250,8 @@ def main():
                         dist.barrier()
 
                     dataset = build_dataset(dataset_name, **dataset_kwargs)
+                    if args.data_limit is not None:
+                        dataset.data = dataset.data.iloc[: args.data_limit]
                     if dataset is None:
                         logger.error(f'Dataset {dataset_name} is not valid, will be skipped. ')
                         continue

@@ -1,5 +1,7 @@
 from PIL import Image
 import torch
+from transformers import AutoProcessor, AutoModelForCausalLM, GenerationConfig
+from transformers import BitsAndBytesConfig
 
 from .base import BaseModel
 from ..smp import *
