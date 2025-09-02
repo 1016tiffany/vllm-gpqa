@@ -2,6 +2,9 @@
 """
 Benchmark Phi-4 multimodal‐instruct on abstractive summarization.
 
+Edits lines 80-100 for LUQ Qwen Evaluation
+Install packages from requirements.txt 
+
 Usage (defaults shown):
     python benchmark_summarization.py \
         --model microsoft/Phi-4-multimodal-instruct \
