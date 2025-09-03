@@ -7,7 +7,7 @@ Install packages from requirements.txt
 
 Usage (defaults shown):
     python benchmark_summarization.py \
-        --model microsoft/Phi-4-multimodal-instruct \
+        --model Qwen/Qwen2.5-VL-7B-Instruct-AWQ \
         --dataset cnn_dailymail \
         --split test \
         --batch_size 4 \
