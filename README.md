@@ -2,15 +2,35 @@ We use the VLMEvalKit repo to conduct benchmarking. Llava.py needs to be edited 
 
 Code to evaluate:
 ```bash
-python3 run.py --data [DATASET] --model llava_v1.5_7b
+python3 run.py --data [DATASET] --model llava_v1.5_7b --data-limit num_samples --n-1bit num_1_bit_layers
 ```
 Current model options:
 1. llava_v1.5_7b
 2. Qwen2.5-VL-7B-Instruct
+3. molmo-7B-D-0924
 
 To edit number of 1-bit layers in LUQ'ed model, edit:
 1. vlmeval/vlm/llava/llava.py
 2. vlmeval/vlm/qwen2_vl/model.py
+3. vlmeval/vlm/molmo.py
+
+**Required edits for testing a new model**
+
+* You need to edit vlmeval/config.py to add the new 4bit and 1bit model if it doesn't already exist
+
+* Also you need to edit the setup file for the model in vlmeval/vlm to choose layers from the 4bit and 1bit model based on the parameter n_1bit (See vlmeval/vlm/molmo.py for reference)
+
+**Example code to run (to generate graph of Accuracy vs Number of 1-bit Layers):**
+
+Get results:
+```bash
+bash test_molmo.sh
+```
+
+Plot results:
+```bash
+python molmo_textvqa_result_plot.py
+```
 
 (working on adding as command line argument)
 
