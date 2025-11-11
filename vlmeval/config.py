@@ -1,6 +1,8 @@
 from vlmeval.vlm import *
 from vlmeval.api import *
 from functools import partial
+from vlmeval.vlm.gptoss_gguf import GPTOSSChat
+
 
 PandaGPT_ROOT = None
 MiniGPT4_ROOT = None
@@ -1215,8 +1217,32 @@ llama_series = {
     "Llama-3.2-90B-Vision-Instruct": partial(
         llama_vision, model_path="meta-llama/Llama-3.2-90B-Vision-Instruct"
     ),
+    # For an HF or vLLM-hosted Llama 4 Scout:
     "Llama-4-Scout-17B-16E-Instruct": partial(
-        llama4, model_path="meta-llama/Llama-4-Scout-17B-16E-Instruct", use_vllm=True
+        llama4,
+        model_path="meta-llama/Llama-4-Scout-17B-16E-Instruct",
+        backend="vllm",
+        gpu_utils=0.9,
+    ),
+    "Llama-4-Maverick-17B-128E-Instruct-LUQ-GGUF": partial(
+        llama4,
+        model_path="../luq-qwen-demo/models/Llama-4-Maverick-17B-128E-Instruct-LUQ.gguf",
+        backend="llama_cpp",
+    ),
+    "Llama-4-Maverick-17B-128E-Instruct-4bit-GGUF": partial(
+        llama4,
+        model_path="../luq-qwen-demo/models/Llama-4-Maverick-17B-128E-Instruct-Q4_K_M.gguf",
+        backend="llama_cpp",
+    ),
+    "Llama-4-Maverick-17B-128E-Instruct-16bit-GGUF": partial(
+        llama4,
+        model_path="../luq-qwen-demo/models/Llama-4-Maverick-17B-128E-Instruct-BF16.gguf",
+        backend="llama_cpp",
+    ),
+    "Llama-4-Maverick-17B-128E-Instruct-16bit": partial(
+        llama4,
+        model_path="../llama4-maverick",
+        backend="hf",
     ),
 }
 
@@ -1285,6 +1311,32 @@ gemma_series = {
     'Gemma3-12B': partial(Gemma3, model_path='google/gemma-3-12b-it'),
     'Gemma3-27B': partial(Gemma3, model_path='google/gemma-3-27b-it')
 }
+gpt_oss_series = {
+    "gpt-oss-20b-F16": partial(GPTOSSChat, model_path="/workspace/models/gpt-oss-20b-GGUF/gpt-oss-20b-F16.gguf"),
+    "gpt-oss-20b-Q2_K": partial(GPTOSSChat, model_path="/workspace/models/gpt-oss-20b-GGUF/gpt-oss-20b-Q2_K.gguf"),
+    "gpt-oss-20b-Q3_K_S": partial(GPTOSSChat, model_path="/workspace/models/gpt-oss-20b-GGUF/gpt-oss-20b-Q3_K_S.gguf"),
+    "gpt-oss-20b-Q4_K_M": partial(GPTOSSChat, model_path="/workspace/models/gpt-oss-20b-GGUF/gpt-oss-20b-Q4_K_M.gguf"),
+    "gpt-oss-20b-LUQ_2_layers": partial(GPTOSSChat, model_path="/workspace/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_2_layers.gguf"),
+    "gpt-oss-20b-LUQ_3_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_3_layers.gguf"),
+    "gpt-oss-20b-LUQ_4_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_4_layers.gguf"),
+    "gpt-oss-20b-LUQ_5_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_5_layers.gguf"),
+    "gpt-oss-20b-LUQ_6_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_6_layers.gguf"),
+    "gpt-oss-20b-LUQ_7_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_7_layers.gguf"),
+    "gpt-oss-20b-LUQ_8_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_8_layers.gguf"),
+    "gpt-oss-20b-LUQ_9_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_9_layers.gguf"),
+    "gpt-oss-20b-LUQ_10_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_10_layers.gguf"),
+    "gpt-oss-20b-LUQ_11_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_11_layers.gguf"),
+    "gpt-oss-20b-LUQ_12_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_12_layers.gguf"),
+    "gpt-oss-20b-LUQ_13_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_13_layers.gguf"),
+    "gpt-oss-20b-LUQ_14_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_14_layers.gguf"),
+    "gpt-oss-20b-LUQ_15_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_15_layers.gguf"),
+    "gpt-oss-20b-LUQ_16_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_16_layers.gguf"),
+    "gpt-oss-20b-LUQ_17_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_17_layers.gguf"),
+    "gpt-oss-20b-LUQ_18_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_18_layers.gguf"),
+    "gpt-oss-20b-LUQ_19_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_19_layers.gguf"),
+    "gpt-oss-20b-LUQ_20_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_20_layers.gguf"),
+    "gpt-oss-20b-LUQ_21_layers": partial(GPTOSSChat, model_path="/mnt/nvme1n1/clarity/luq/models/gpt-oss-20b-GGUF/gpt-oss-20b-LUQ_21_layers.gguf"),
+}
 
 kimi_series = {
     'Kimi-VL-A3B-Thinking': partial(KimiVL, model_path='moonshotai/Kimi-VL-A3B-Thinking'),
@@ -1312,7 +1364,7 @@ model_groups = [
     kosmos_series, points_series, nvlm_series, vintern_series, h2ovl_series,
     aria_series, smolvlm_series, sail_series, valley_series, vita_series,
     ross_series, emu_series, ola_series, ursa_series, gemma_series,
-    long_vita_series, ristretto_series, kimi_series
+    long_vita_series, ristretto_series, kimi_series, gpt_oss_series
 ]
 
 for grp in model_groups:
