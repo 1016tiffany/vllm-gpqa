@@ -48,6 +48,19 @@ MMT_abbrs = {
     'gui_navigation': 'GN'
 }
 
+def _normalize_mcq_pred(pred, item):
+    """
+    Convert single-letter answers to option text for exact-matching,
+    and perform light normalization on strings.
+    """
+    s = str(pred or "").strip()
+    # If it's exactly A-E, map to the option text
+    if re.fullmatch(r"[A-E]", s, flags=re.I):
+        key = s.upper()
+        opt = item.get(key, "")
+        return str(opt or "").strip()
+    # Otherwise return normalized string
+    return s
 
 def MMMU_preproc(data):
     logger = get_logger('Evaluation')
@@ -379,14 +392,35 @@ def prefetch_circular_group(sub_data, verbose=False):
     ret = ret + (GT, PRED) if verbose else ret
     return ret if len(ret) > 1 else ret[0]
 
+# # Original 
+# def eval_vanilla(model, item, dataset_name=None):
+#     res = extract_answer_from_item(model, item, dataset_name=dataset_name)
+#     opt, match_log = res['opt'], res['log']
+#     if opt == item['GT']:
+#         return dict(hit=1, log=f'Match Log: {match_log}. ')
+#     else:
+#         return dict(hit=0, log=f'Match Log: {match_log}. ')
 
+# My version for GPQA
 def eval_vanilla(model, item, dataset_name=None):
-    res = extract_answer_from_item(model, item, dataset_name=dataset_name)
-    opt, match_log = res['opt'], res['log']
+    out = extract_answer_from_item(model, item, dataset_name=dataset_name)
+
+    # Ensure compatibility — normalize returns a dict, not a string
+    if isinstance(out, str):
+        out = {"opt": out, "log": ""}
+
+    # New normalization for gpqa
+    res = _normalize_mcq_pred(out, item)
+    if isinstance(res, str):
+        # Fallback safety — convert to dict if normalize returns a plain string
+        res = {"opt": res, "log": ""}
+
+    opt, match_log = res.get('opt'), res.get('log', '')
     if opt == item['GT']:
         return dict(hit=1, log=f'Match Log: {match_log}. ')
     else:
         return dict(hit=0, log=f'Match Log: {match_log}. ')
+
 
 
 # For Circular Evaluation
