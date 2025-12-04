@@ -1312,6 +1312,7 @@ gemma_series = {
     'Gemma3-27B': partial(Gemma3, model_path='google/gemma-3-27b-it')
 }
 gpt_oss_series = {
+    "gpt-oss-20b-OpenAI": partial(GPTOSS20B, model_path="/workspace/models/gpt-oss-20b", use_harmony=True),
     "gpt-oss-20b-F16": partial(GPTOSSChat, model_path="/workspace/models/gpt-oss-20b-GGUF/gpt-oss-20b-F16.gguf"),
     "gpt-oss-20b-Q2_K": partial(GPTOSSChat, model_path="/workspace/models/gpt-oss-20b-GGUF/gpt-oss-20b-Q2_K.gguf"),
     "gpt-oss-20b-Q3_K_S": partial(GPTOSSChat, model_path="/workspace/models/gpt-oss-20b-GGUF/gpt-oss-20b-Q3_K_S.gguf"),
