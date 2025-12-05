@@ -146,33 +146,33 @@ class GPTOSS20B(BaseModel):
         stop_token_ids = self._harmony_encoding.stop_tokens_for_assistant_actions()
         return prefill_ids, stop_token_ids
 
-def generate_inner(self, message, dataset=None):
-    prompt, _ = self.message_to_promptimg(message, dataset=dataset)
+    def generate_inner(self, message, dataset=None):
+        prompt, _ = self.message_to_promptimg(message, dataset=dataset)
 
-    if not self.use_vllm and self.use_harmony:
+        if not self.use_vllm and self.use_harmony:
         # Build chat-style messages with reasoning level high, tools disabled
-        messages = [
+            messages = [
             {"role": "system", "content": "You are a helpful assistant. Reasoning: high. Tools: disabled."},
             {"role": "user", "content": prompt},
-        ]
-        chat_prompt = self.tokenizer.apply_chat_template(
+            ]
+            chat_prompt = self.tokenizer.apply_chat_template(
             messages,
             tokenize=False,
             add_generation_prompt=True,
-        )
-        prompt_text = chat_prompt
-    else:
-        prompt_text = prompt
+            )
+            prompt_text = chat_prompt
+        else:
+            prompt_text = prompt
 
-    encoded = self.tokenizer([prompt_text], return_tensors="pt", padding=False)
-    encoded = {k: v.to(self.model.device) for k, v in encoded.items()}
-    gen = self.model.generate(
+        encoded = self.tokenizer([prompt_text], return_tensors="pt", padding=False)
+        encoded = {k: v.to(self.model.device) for k, v in encoded.items()}
+        gen = self.model.generate(
         **encoded,
         do_sample=self.kwargs.get("do_sample", False),
         num_beams=self.kwargs.get("num_beams", 1),
         max_new_tokens=self.kwargs.get("max_new_tokens", 512),
         use_cache=self.kwargs.get("use_cache", True),
-    )
-    out = self.tokenizer.decode(gen[0][encoded["input_ids"].size(1):], skip_special_tokens=True)
-    return out.strip()
+        )
+        out = self.tokenizer.decode(gen[0][encoded["input_ids"].size(1):], skip_special_tokens=True)
+        return out.strip()
 
